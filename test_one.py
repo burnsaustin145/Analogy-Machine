@@ -1,4 +1,5 @@
-from central_graph import *
+from graphdict import *
+from complexobject import *
 import pprint
 
 if __name__ == "__main__":
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     graph.add_arc("Connor", "Skinny", "tall", "white", "college", "student", "word")
     graph.add_arc("Miranda", "student", "small", "short", "happy")
     print(pprint.pprint(universe.graph_dict))
-    print("First L1Cu construction test (Mirand, Connor)")
+    print("First L1Cu construction test (Miranda, Connor)")
     print(universe.complex_universe_construction('Miranda', 'Connor'))
     print('find all parents (person)')
     print(graph.set_of_parents('Person'))
@@ -43,8 +44,14 @@ if __name__ == "__main__":
     print(universe.complex_quality_construction('Miranda', 'Austin'))
     print("Complex object construction test: ")
     print(universe.complex_object_construction('Miranda', 'Austin'))
+    print("graph. graph_dict test here folks:")
     print(pprint.pprint(graph.graph_dict))
-    print(graph.set_of_parents('Austin'))
+    graph.graph_dict['foo'] = "this is added after graph.graph_dict, but before universe.graph dict is printed"
+    print("universe.graph_dict test here folks:")
+    print(pprint.pprint(universe.graph_dict))
+
+    print(graph.get_graph())
+    print(GraphDict.get_graph(graph))
 
 
 
