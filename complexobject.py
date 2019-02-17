@@ -126,8 +126,3 @@ class ComplexObject(object):
 
         return name_creation
 
-    def l1cuf(self, *node):
-        """takes n nodes and returns fuzzy
-        universe w/ fuzz rating as arc weight. """
-
-        for foo in node:
