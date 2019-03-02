@@ -1,21 +1,33 @@
 from graphdict import *
 from complexobject import *
 
+g = GraphDict()
+co = ComplexObject(g.graph_dict)
+
 
 class Control(object):
 
-    def __init__(self, graph_dict=None):
+    def __init__(self):
+        return
 
-        if graph_dict is None:
-            self.graph_dict = self.g.graph_dict
-        else:
-            self.graph_dict = {}
+    @staticmethod
+    def composition(*node):
+        g.add_node(*node)
+        """and here's where I'll start composing all of
+        the other complex constructors and what not;
+        still need to think on design a bit."""
 
-    def control(self):
-        self.g(self.graph_dict)
-        self.c(self.graph_dict)
-        self.g.add_arc("Connor", "Burns")
-        print(self.graph_dict)
+
+c = Control()
+c.composition('Austin', 'Miranda', 'Connor')
+
+print(g.graph_dict)
+print(co.graph_dict)
+
+
+
+
+
 
 
 
