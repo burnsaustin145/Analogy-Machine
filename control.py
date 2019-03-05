@@ -13,6 +13,8 @@ class Control(object):
     @staticmethod
     def composition(*node):
         g.add_node(*node)
+        """I think this might take nothing but """
+        co.complex_object_construction(*node)
         """and here's where I'll start composing all of
         the other complex constructors and what not;
         still need to think on design a bit."""
