@@ -1,1 +1,1 @@
-#analogy_machine
+Proof of concept project for semantic network AI.
