@@ -1,13 +1,22 @@
+import networkx as nx
+
 class ComplexObject(object):
 
-    def __init__(self, graph_dict=None):
-
+    def __init__(self, graph=None):
         self.complex_universe = {}
+        self.name_id = 0
         self.names = {}  # names to be used for Co construction, collects and checks for redundancy
-        if graph_dict is None:
-            self.graph_dict = {}
+        if graph is None:
+            self.graph = nx.DiGraph()
         else:
-            self.graph_dict = graph_dict
+            if isinstance(graph, dict):
+                self.graph = nx.DiGraph()
+                for node, edges in graph.items():
+                    self.graph.add_node(node)
+                    for target, weight in edges.items():
+                        self.graph.add_edge(node, target, weight=weight)
+            else:
+                self.graph = graph
 
     def complex_universe_construction(self, *node, union=False):
         """takes k nodes and returns a l1cu.
@@ -16,15 +25,13 @@ class ComplexObject(object):
         one_meta_universe = {}
 
         for foo in node:
-            if self.graph_dict[foo]:
+            if foo in self.graph:
                 bar = set()
-                for baz in self.graph_dict[foo]:
-                    if self.graph_dict[foo][baz] == 1:
-                        bar.add(baz)
-                    else:
-                        pass
-
-            one_meta_universe[foo] = bar
+                # adjusted to use successors properly 
+                for baz in self.graph.successors(foo):
+                    bar.add(baz)
+            if bar is not None:
+                one_meta_universe[foo] = bar
 
         container = []
 
@@ -40,20 +47,19 @@ class ComplexObject(object):
             name = 'l1cuo-{}'.format(self.name_creation(*sett, 'l1cu'))
 
             self.complex_universe[name] = inner_dict
-            self.graph_dict[name] = inner_dict
+            self.graph.add_edges_from([(foo, bar) for foo in sett for bar in sett if foo != bar])
         else:
             inner_dict = {}
             sett = set.intersection(*container)
             for foo in sett:
-                print('foo' + foo)
                 inner_dict[foo] = 1
 
             name = 'l1cuc-{}'.format(self.name_creation(*sett, level='l1cu'))
 
             self.complex_universe[name] = inner_dict
-            self.graph_dict[name] = inner_dict
+            self.graph.add_edges_from([(foo, bar) for foo in sett for bar in sett if foo != bar])
 
-        return self.graph_dict[name]
+        return self.graph
 
     def complex_quality_construction(self, *node):
         """takes n nodes and returns a complex quality
@@ -69,7 +75,7 @@ class ComplexObject(object):
             inner[foo] = 1
 
         l1cq[name] = inner
-        self.graph_dict[name] = inner
+        self.graph.add_edges_from([(foo, bar) for foo in inner for bar in inner if foo != bar])
         return l1cq
 
     def complex_object_construction(self, *node):
@@ -89,10 +95,10 @@ class ComplexObject(object):
                 curr_o.add(bar)
 
         inner = dict()
-        for baz in self.graph_dict:
+        for baz in self.graph:
             curr_q = set()
 
-            for bar in self.graph_dict[baz]:
+            for bar in self.graph.successors(baz):
                 curr_q.add(bar)
 
             if set.intersection(curr_q, curr_o) == set():
@@ -105,7 +111,7 @@ class ComplexObject(object):
                 inner[baz] = 1
 
         l1co[name] = inner
-        self.graph_dict[name] = inner
+        self.graph.add_edges_from([(foo, bar) for foo in inner for bar in inner if foo != bar])
 
         return l1co
 
@@ -116,7 +122,7 @@ class ComplexObject(object):
 
         name_creation = ''
         for foo in node:
-            name_creation += foo[0]
+            name_creation += str(foo)
 
         if name_creation in self.names:
             name_creation += 'x'
@@ -124,5 +130,10 @@ class ComplexObject(object):
         else:
             self.names[name_creation] = level
 
-        return name_creation
+        if name_creation is not None:
+            return name_creation
+        else:
+            self.name_id += 1
+            return self.name_id
+
 
