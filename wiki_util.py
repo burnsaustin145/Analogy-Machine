@@ -50,8 +50,8 @@ class WikiUtil:
         curr_graph = nx.DiGraph()
         curr_doc = self.parse(content)
         
-        # Process only up to 5 sentences
-        for i, sentence in enumerate(curr_doc.sentences[:5]):
+        # Visualize the first 5 sentences
+        for i, sentence in enumerate(curr_doc.sentences):
             # Add nodes for each word in the sentence
             for word in sentence.words:
                 curr_graph.add_node(word.text)
@@ -62,14 +62,15 @@ class WikiUtil:
                     curr_graph.add_edge(word.text, sentence.words[word.head - 1].text, weight=1)
                     print("curr edge: ", word.text, sentence.words[word.head - 1].text)
             
-            # Visualize the graph after each sentence
-            plt.figure(figsize=(12, 8))
-            pos = nx.spring_layout(curr_graph)
-            nx.draw(curr_graph, pos, with_labels=True, node_color='lightblue', 
-                   node_size=100, font_size=8, font_weight='bold', arrows=True)
-            plt.title(f"Sentence {i+1} Dependency Graph")
-            plt.savefig(f'sentence_{i+1}_graph.png')
-            plt.close()
+            if i < 5:
+                # Visualize the graph after each sentence
+                plt.figure(figsize=(12, 8))
+                pos = nx.spring_layout(curr_graph)
+                nx.draw(curr_graph, pos, with_labels=True, node_color='lightblue', 
+                       node_size=100, font_size=8, font_weight='bold', arrows=True)
+                plt.title(f"Sentence {i+1} Dependency Graph")
+                plt.savefig(f'sentence_{i+1}_graph.png')
+                plt.close()
         
         # Update ComplexObject with the new graph
         print("curr graph: ", curr_graph)
