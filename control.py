@@ -21,7 +21,7 @@ class Control(object):
 
 
 c = Control()
-c.composition('Austin', 'Miranda', 'Connor')
+c.composition('comp nodes')
 
 print(g.graph_dict)
 print(co.graph_dict)

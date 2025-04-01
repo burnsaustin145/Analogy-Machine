@@ -19,7 +19,7 @@ class WikiUtil:
         self.graph = nx.DiGraph()
         self.complex_obj = ComplexObject(self.graph)
         stanza.download('en')  # Download English models
-        self.parse = stanza.Pipeline('en')
+        self.parse = stanza.Pipeline('en', device='cuda', processors='tokenize,mwt,pos,lemma,depparse')
 
     def fetch_wikipedia_content(self, title):
         """Fetch raw content from Wikipedia using MediaWiki API"""
@@ -43,20 +43,36 @@ class WikiUtil:
 
     def parse_to_complex_object(self, title):
         """Parse Wikipedia content into a ComplexObject"""
+        import matplotlib.pyplot as plt
 
         # Fetch content
         content = self.fetch_wikipedia_content(title)
         curr_graph = nx.DiGraph()
         curr_doc = self.parse(content)
-        for sentence in curr_doc.sentences:
+        
+        # Process only up to 5 sentences
+        for i, sentence in enumerate(curr_doc.sentences[:5]):
+            # Add nodes for each word in the sentence
             for word in sentence.words:
                 curr_graph.add_node(word.text)
             
+            # Add edges based on dependency parsing
             for word in sentence.words:
                 if word.head != 0:
-                    curr_graph.add_edge(word.head, word.text, weight=1)
+                    curr_graph.add_edge(word.text, sentence.words[word.head - 1].text, weight=1)
+                    print("curr edge: ", word.text, sentence.words[word.head - 1].text)
+            
+            # Visualize the graph after each sentence
+            plt.figure(figsize=(12, 8))
+            pos = nx.spring_layout(curr_graph)
+            nx.draw(curr_graph, pos, with_labels=True, node_color='lightblue', 
+                   node_size=100, font_size=8, font_weight='bold', arrows=True)
+            plt.title(f"Sentence {i+1} Dependency Graph")
+            plt.savefig(f'sentence_{i+1}_graph.png')
+            plt.close()
+        
         # Update ComplexObject with the new graph
-        print("curr graph: ", curr_graph.nodes())
+        print("curr graph: ", curr_graph)
         self.complex_obj.graph = curr_graph
         return self.complex_obj
 

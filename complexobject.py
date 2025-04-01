@@ -109,7 +109,7 @@ class ComplexObject(object):
                 name = "l1co-{}".format(name_creation)
 
                 inner[baz] = 1
-
+        name = 'l1co-{}'.format(self.name_creation(*curr_q, level='l1co'))
         l1co[name] = inner
         self.graph.add_edges_from([(foo, bar) for foo in inner for bar in inner if foo != bar])
 
