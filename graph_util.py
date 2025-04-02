@@ -141,12 +141,18 @@ def compare_graphs(graph1, graph2, metrics_to_compare=None):
 if __name__ == "__main__":
     # Example usage
     from wiki_util import WikiUtil
-    
+    import os
     # Initialize WikiUtil and parse a Wikipedia page
-    wiki = WikiUtil()
-    page_title = "Python (programming language)"
-    print(f"Analyzing Wikipedia page: {page_title}")
-    complex_obj = wiki.parse_to_complex_object(page_title)
+        # Load from pickle if available, otherwise parse and save
+    page_title = "Python (programming language"
+    pickle_path = "graph.pkl"
+    if os.path.exists(pickle_path):
+        print(f"Loading graph from '{pickle_path}'")
+        complex_obj = ComplexObject(pickle_path=pickle_path)
+    else:
+        wiki = WikiUtil()
+        print(f"Parsing Wikipedia page: {page_title}")
+        complex_obj = wiki.parse_to_complex_object(page_title, pickle_path=pickle_path)
     
     # Analyze the graph
     metrics = analyze_graph(complex_obj.graph)

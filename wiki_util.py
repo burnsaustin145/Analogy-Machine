@@ -3,6 +3,7 @@
 import pickle
 import subprocess
 import sys
+import os
 
 import requests
 import nltk
@@ -14,13 +15,13 @@ import stanza
 
 
 class WikiUtil:
-    def __init__(self):
+    def __init__(self, visualize=False):
         """Initialize with an empty ComplexObject using NetworkX"""
         self.graph = nx.DiGraph()
         self.complex_obj = ComplexObject(self.graph)
         stanza.download('en')  # Download English models
         self.parse = stanza.Pipeline('en', device='cuda', processors='tokenize,mwt,pos,lemma,depparse')
-
+        self.visualize = visualize
     def fetch_wikipedia_content(self, title):
         """Fetch raw content from Wikipedia using MediaWiki API"""
         url = "https://en.wikipedia.org/w/api.php"
@@ -62,7 +63,7 @@ class WikiUtil:
                     curr_graph.add_edge(word.text, sentence.words[word.head - 1].text, weight=1)
                     print("curr edge: ", word.text, sentence.words[word.head - 1].text)
             
-            if i < 5:
+            if i < 5 and self.visualize:
                 # Visualize the graph after each sentence
                 plt.figure(figsize=(12, 8))
                 pos = nx.spring_layout(curr_graph)
@@ -71,9 +72,7 @@ class WikiUtil:
                 plt.title(f"Sentence {i+1} Dependency Graph")
                 plt.savefig(f'sentence_{i+1}_graph.png')
                 plt.close()
-        
-        # Update ComplexObject with the new graph
-        print("curr graph: ", curr_graph)
+
         self.complex_obj.graph = curr_graph
         return self.complex_obj
 
@@ -81,4 +80,21 @@ class WikiUtil:
         """Return the ComplexObject instance"""
         return self.complex_obj 
     
+    def save_complex_object(self, pickle_file="wiki_graph.pickle"):
+        """Save the ComplexObject to a pickle file"""
+        with open(pickle_file, 'wb') as f:
+            pickle.dump(self.complex_obj, f)
+        print(f"ComplexObject saved to {pickle_file}")
+        
+    def load_complex_object(self, pickle_file="wiki_graph.pickle"):
+        """Load a ComplexObject from a pickle file"""
+        if not os.path.exists(pickle_file):
+            raise FileNotFoundError(f"Pickle file not found: {pickle_file}")
+        
+        with open(pickle_file, 'rb') as f:
+            self.complex_obj = pickle.load(f)
+        
+        print(f"ComplexObject loaded from {pickle_file}")
+        return self.complex_obj
+
 

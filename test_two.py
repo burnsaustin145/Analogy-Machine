@@ -7,10 +7,16 @@ import networkx as nx
 
 if __name__ == "__main__":
     # Initialize WikiUtil and parse a Wikipedia page
-    wiki = WikiUtil()
-    page_title = "Python (programming language)"
-    print(f"Parsing Wikipedia page: {page_title}")
-    complex_obj = wiki.parse_to_complex_object(page_title)
+    import os
+    page_title = "Python (programming language"
+    pickle_path = "graph.pkl"
+    if os.path.exists(pickle_path):
+        print(f"Loading graph from '{pickle_path}'")
+        complex_obj = ComplexObject(pickle_path=pickle_path)
+    else:
+        wiki = WikiUtil()
+        print(f"Parsing Wikipedia page: {page_title}")
+        complex_obj = wiki.parse_to_complex_object(page_title, pickle_path=pickle_path)
 
     # Print initial graph structure
     """

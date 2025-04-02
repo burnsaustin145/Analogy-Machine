@@ -2,19 +2,33 @@ from complexobject import *
 from wiki_util import WikiUtil
 import pprint
 import networkx as nx
+import os
+import pickle
+from pickle_graph import load_pickled_graph, create_and_pickle_graph
 
 if __name__ == "__main__":
-    # Initialize WikiUtil and parse a Wikipedia page
-    wiki = WikiUtil()
+    pickle_file = "wiki_graph.pickle"
     page_title = "Python (programming language)"
-    print(f"Parsing Wikipedia page: {page_title}")
-    complex_obj = wiki.parse_to_complex_object(page_title)
+    
+    # Check if pickled graph exists, create it if it doesn't
+    if not os.path.exists(pickle_file):
+        print(f"Pickle file not found. Creating new graph from {page_title}...")
+        complex_obj = create_and_pickle_graph(page_title, pickle_file)
+    else:
+        # Load the pickled graph
+        print(f"Loading graph from {pickle_file}...")
+        complex_obj = load_pickled_graph(pickle_file)
 
     # Print initial graph structure
-    print("\nInitial graph structure from Wikipedia:")
+    print("\nGraph structure from pickled data:")
+    node_count = 0
     for node in complex_obj.graph.nodes():
         if len(dict(complex_obj.graph[node])) > 0:  # Only print nodes with edges
             print(f"{node}: {dict(complex_obj.graph[node])}")
+            node_count += 1
+            if node_count >= 10:  # Limit output to first 10 nodes
+                print("... (more nodes with edges)")
+                break
 
     # Test complex constructions with sample nodes
     sample_nodes = ["python", "programming", "Solaris"]
@@ -28,8 +42,7 @@ if __name__ == "__main__":
     print(complex_obj.complex_object_construction(*sample_nodes))
 
     # Print final graph structure (limited to nodes with edges)
-    print("\nFinal graph structure:")
-
+    print("\nFinal graph structure (after operations):")
     
     # Visualize the graph using networkx and matplotlib
     import matplotlib.pyplot as plt

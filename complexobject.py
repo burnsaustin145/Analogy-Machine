@@ -1,12 +1,16 @@
+import pickle
 import networkx as nx
 
 class ComplexObject(object):
 
-    def __init__(self, graph=None):
+    def __init__(self, graph=None, pickle_path=None):
         self.complex_universe = {}
         self.name_id = 0
         self.names = {}  # names to be used for Co construction, collects and checks for redundancy
-        if graph is None:
+        if pickle_path:
+            with open(pickle_path, 'rb') as f:
+                self.graph = pickle.load(f)
+        elif graph is None:
             self.graph = nx.DiGraph()
         else:
             if isinstance(graph, dict):
